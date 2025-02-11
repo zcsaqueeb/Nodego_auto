@@ -193,9 +193,10 @@ class NodeGo:
                     continue
 
                 return self.print_message(self.mask_account(email), proxy, Fore.WHITE, 
-                    f"Node {num_id}"
-                    f"{Fore.MAGENTA + Style.BRIGHT} - {Style.RESET_ALL}"
-                    f"{Fore.RED + Style.BRIGHT}PING Failed{Style.RESET_ALL}"
+                    f"Node {num_id} "
+                    f"{Fore.MAGENTA + Style.BRIGHT}-{Style.RESET_ALL}"
+                    f"{Fore.RED + Style.BRIGHT} PING Failed: {Style.RESET_ALL}"
+                    f"{Fore.YELLOW + Style.BRIGHT}{str(e)}{Style.RESET_ALL}"
                 )
 
     async def process_send_ping(self, token: str, email: str, num_id: int, use_proxy: bool):
