@@ -14,7 +14,7 @@ NodeGo BOT
   - Supports Multi Nodes For Each Account
   - Multi Accounts With Threads
 
-- Note: Only running 1 node if run without proxy.
+Note: Only running 1 node if run without proxy.
 
 ## Requiremnets
 
