@@ -14,7 +14,10 @@ NodeGo BOT
   - Supports Multi Nodes For Each Account
   - Multi Accounts With Threads
 
-Note: Only running 1 node if run without proxy.
+Note: 
+1. Only running 1 node if run without proxy.
+2. Some features will be available soon.
+3. If there is an error. Please first find out the meaning of the error with the status code displayed. if the error is with status code 500 or higher. The problem is on the project server. Some of you opened an issue and complained that there was an error with status code 502 and told me to update the bot. Hey sir, are you kidding me?
 
 ## Requiremnets
 
