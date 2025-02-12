@@ -1,9 +1,4 @@
-from aiohttp import (
-    ClientResponseError,
-    ClientSession,
-    ClientTimeout
-)
-from aiohttp_socks import ProxyConnector
+from curl_cffi import requests
 from fake_useragent import FakeUserAgent
 from datetime import datetime
 from colorama import *
@@ -55,13 +50,12 @@ class NodeGo:
         filename = "proxy.txt"
         try:
             if use_proxy_choice == 1:
-                async with ClientSession(timeout=ClientTimeout(total=30)) as session:
-                    async with session.get("https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/all.txt") as response:
-                        response.raise_for_status()
-                        content = await response.text()
-                        with open(filename, 'w') as f:
-                            f.write(content)
-                        self.proxies = content.splitlines()
+                response = await asyncio.to_thread(requests.get, "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/all.txt")
+                response.raise_for_status()
+                content = response.text()
+                with open(filename, 'w') as f:
+                    f.write(content)
+                self.proxies = content.splitlines()
             else:
                 if not os.path.exists(filename):
                     self.log(f"{Fore.RED + Style.BRIGHT}File {filename} Not Found.{Style.RESET_ALL}")
@@ -180,14 +174,12 @@ class NodeGo:
             "Content-Type": "application/json",
         }
         for attempt in range(retries):
-            connector = ProxyConnector.from_url(proxy) if proxy else None
             try:
-                async with ClientSession(connector=connector, timeout=ClientTimeout(total=60)) as session:
-                    async with session.post(url=url, headers=headers, data=data) as response:
-                        response.raise_for_status()
-                        result = await response.json()
-                        return result["metadata"]
-            except (Exception, ClientResponseError) as e:
+                response = await asyncio.to_thread(requests.post, url=url, headers=headers, data=data, proxy=proxy, timeout=60, impersonate="safari15_5")
+                response.raise_for_status()
+                result = response.json()
+                return result["metadata"]
+            except Exception as e:
                 if attempt < retries - 1:
                     await asyncio.sleep(5)
                     continue
