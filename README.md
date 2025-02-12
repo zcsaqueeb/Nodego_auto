@@ -10,14 +10,14 @@ NodeGo BOT
   - Auto Run With [Monosans](https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/all.txt) Proxy - Choose 1
   - Auto Run With Private Proxy - Choose 2
   - Auto Run Without Proxy - Choose 3
+  - Auto Claim Daily Check-In
   - Auto Added Node & Send Ping Every 1 Minutes
   - Supports Multi Nodes For Each Account
   - Multi Accounts With Threads
 
 Note: 
 1. Only running 1 node if run without proxy.
-2. Some features will be available soon.
-3. If there is an error. Please first find out the meaning of the error with the status code displayed. if the error is with status code 500 or higher. The problem is on the project server. Some of you opened an issue and complained that there was an error with status code 502 and told me to update the bot. Hey sir, are you kidding me?
+2. If there is an error. Please first find out the meaning of the error with the status code displayed. if the error is with status code 500 or higher. The problem is on the project server. Some of you opened an issue and complained that there was an error with status code 502 and told me to update the bot. Hey sir, are you kidding me?
 
 ## Requiremnets
 
