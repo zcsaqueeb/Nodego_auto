@@ -201,7 +201,11 @@ class NodeGo:
             try:
                 response = await asyncio.to_thread(requests.post, url=url, headers=headers, proxy=proxy, timeout=60, impersonate="safari15_5")
                 if response.status_code == 400:
-                    return None
+                    return self.print_message(self.mask_account(email), proxy, Fore.WHITE, 
+                        f"Check-In Day {day_checkin}"
+                        f"{Fore.RED + Style.BRIGHT} Isn't Claimed: {Style.RESET_ALL}"
+                        f"{Fore.YELLOW + Style.BRIGHT} Already Claimed{Style.RESET_ALL}"
+                    )
                 
                 response.raise_for_status()
                 result = response.json()
@@ -212,7 +216,61 @@ class NodeGo:
                     continue
 
                 return self.print_message(self.mask_account(email), proxy, Fore.RED, 
-                    f"Checkin Day {day_checkin} Isn't Calimed: "
+                    f"Checkin Day {day_checkin} Isn't Claimed: "
+                    f"{Fore.YELLOW + Style.BRIGHT}{str(e)}{Style.RESET_ALL}"
+                )
+
+    async def task_lists(self, token: str, email: str, proxy=None, retries=5):
+        url = "https://nodego.ai/api/tasks"
+        headers = {
+            **self.headers,
+            "Authorization": f"Bearer {token}",
+        }
+        for attempt in range(retries):
+            try:
+                response = await asyncio.to_thread(requests.get, url=url, headers=headers, proxy=proxy, timeout=60, impersonate="safari15_5")
+                response.raise_for_status()
+                result = response.json()
+                return result["metadata"]
+            except Exception as e:
+                if attempt < retries - 1:
+                    await asyncio.sleep(5)
+                    continue
+
+                return self.print_message(self.mask_account(email), proxy, Fore.RED, 
+                    f"GET Available Tasks Failed: "
+                    f"{Fore.YELLOW + Style.BRIGHT}{str(e)}{Style.RESET_ALL}"
+                )
+            
+    async def complete_tasks(self, token: str, email: str, task_id: str, title: str, proxy=None, retries=5):
+        url = "https://nodego.ai/api/user/task"
+        data = json.dumps({"taskId":task_id})
+        headers = {
+            **self.headers,
+            "Authorization": f"Bearer {token}",
+            "Content-Length": str(len(data)),
+            "Content-Type": "application/json"
+        }
+        for attempt in range(retries):
+            try:
+                response = await asyncio.to_thread(requests.post, url=url, headers=headers, data=data, proxy=proxy, timeout=60, impersonate="safari15_5")
+                if response.status_code == 400:
+                    return self.print_message(self.mask_account(email), proxy, Fore.WHITE, 
+                        f"Task {title}"
+                        f"{Fore.RED + Style.BRIGHT} Isn't Completed: {Style.RESET_ALL}"
+                        f"{Fore.YELLOW + Style.BRIGHT}Not Eligible{Style.RESET_ALL}"
+                    )
+                
+                response.raise_for_status()
+                result = response.json()
+                return result["metadata"]
+            except Exception as e:
+                if attempt < retries - 1:
+                    await asyncio.sleep(5)
+                    continue
+
+                return self.print_message(self.mask_account(email), proxy, Fore.RED, 
+                    f"Task {title} Isn't Completed: "
                     f"{Fore.YELLOW + Style.BRIGHT}{str(e)}{Style.RESET_ALL}"
                 )
             
@@ -265,13 +323,38 @@ class NodeGo:
                     f"{Fore.CYAN + Style.BRIGHT} Reward: {Style.RESET_ALL}"
                     f"{Fore.WHITE + Style.BRIGHT}{message}{Style.RESET_ALL}"
                 )
-            else:
-                self.print_message(self.mask_account(email), proxy, Fore.WHITE, 
-                    f"Check-In Day {day_checkin} "
-                    f"{Fore.YELLOW + Style.BRIGHT}Is Already Claimed{Style.RESET_ALL}"
-                )
 
             await asyncio.sleep(12 * 60 * 60)
+
+    async def process_complete_tasks(self, user, token: str, email: str, use_proxy: bool):
+        while True:
+            proxy = self.get_next_proxy_for_account(email) if use_proxy else None
+
+            completed_tasks = user.get("socialTask", [])
+            tasks = await self.task_lists(token, email, proxy)
+            if tasks:
+                for task in tasks:
+                    if task:
+                        task_id = task.get("code")
+                        title = task.get("title")
+                        reward = task.get("reward")
+
+                        if task_id in completed_tasks:
+                            continue
+
+
+
+                        complete = await self.complete_tasks(token, email, task_id, title, proxy)
+                        if complete and complete.get("message") == "Task claimed successfully":
+                            self.print_message(self.mask_account(email), proxy, Fore.WHITE, 
+                                f"Task {title}"
+                                f"{Fore.GREEN + Style.BRIGHT} Is Completed {Style.RESET_ALL}"
+                                f"{Fore.MAGENTA + Style.BRIGHT}-{Style.RESET_ALL}"
+                                f"{Fore.CYAN + Style.BRIGHT} Reward: {Style.RESET_ALL}"
+                                f"{Fore.WHITE + Style.BRIGHT}{reward} PTS{Style.RESET_ALL}"
+                            )
+
+            await asyncio.sleep(24 * 60 * 60)
 
     async def process_send_ping(self, token: str, email: str, num_id: int, use_proxy: bool):
         while True:
@@ -331,6 +414,7 @@ class NodeGo:
 
             tasks = []
             tasks.append(asyncio.create_task(self.process_daily_checkin(user, token, email, use_proxy)))
+            tasks.append(asyncio.create_task(self.process_complete_tasks(user, token, email, use_proxy)))
             if use_proxy:
                 for i in range(node_count):
                     num_id = i + 1
