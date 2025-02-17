@@ -53,7 +53,7 @@ class NodeGo:
             if use_proxy_choice == 1:
                 response = await asyncio.to_thread(requests.get, "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/all.txt")
                 response.raise_for_status()
-                content = response.text()
+                content = response.text
                 with open(filename, 'w') as f:
                     f.write(content)
                 self.proxies = content.splitlines()
