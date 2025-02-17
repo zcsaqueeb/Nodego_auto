@@ -342,8 +342,6 @@ class NodeGo:
                         if task_id in completed_tasks:
                             continue
 
-
-
                         complete = await self.complete_tasks(token, email, task_id, title, proxy)
                         if complete and complete.get("message") == "Task claimed successfully":
                             self.print_message(self.mask_account(email), proxy, Fore.WHITE, 
