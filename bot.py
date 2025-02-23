@@ -287,6 +287,7 @@ class NodeGo:
             "Sec-Fetch-Dest": "empty",
             "Sec-Fetch-Mode": "cors",
             "Sec-Fetch-Site": "none",
+            "Sec-Fetch-Storage-Access": "active",
             "User-Agent": FakeUserAgent().random
         }
         for attempt in range(retries):
@@ -386,10 +387,10 @@ class NodeGo:
             print(
                 f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
                 f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-                f"{Fore.BLUE + Style.BRIGHT}Wait For 1 Minutes For Next Ping...{Style.RESET_ALL}",
+                f"{Fore.BLUE + Style.BRIGHT}Wait For 2 Minutes For Next Ping...{Style.RESET_ALL}",
                 end="\r"
             )
-            await asyncio.sleep(1 * 60)
+            await asyncio.sleep(2 * 60)
 
     async def process_get_user_data(self, token: str, email: str, use_proxy: bool):
         proxy = self.get_next_proxy_for_account(email) if use_proxy else None
