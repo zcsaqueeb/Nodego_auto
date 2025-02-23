@@ -367,21 +367,13 @@ class NodeGo:
                 flush=True
             )
 
-            text = "Unknown"
-
             ping = await self.send_ping(token, email, num_id, proxy)
             if ping:
                 message = ping.get("message")
-                if message == "Node added successfully":
-                    text = "Added Node Success"
-                elif message in ["Ping successful.", "Ping successful"]:
-                    text = "PING Success"
-
-
                 self.print_message(self.mask_account(email), proxy, Fore.WHITE, 
                     f"Node {num_id}"
                     f"{Fore.MAGENTA + Style.BRIGHT} - {Style.RESET_ALL}"
-                    f"{Fore.GREEN + Style.BRIGHT}{text}{Style.RESET_ALL}"
+                    f"{Fore.GREEN + Style.BRIGHT}{message}{Style.RESET_ALL}"
                 )
 
             print(
