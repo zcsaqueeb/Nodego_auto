@@ -12,9 +12,9 @@ NodeGo BOT
   - Auto Run Without Proxy - Choose 3
   - Auto Claim Daily Check-In
   - Auto Complete Available Tasks
-  - Auto Added Node & Send Ping Every 2 Minutes
-  - Supports Multi Nodes For Each Account
+  - Auto Added Node & Send Ping Every 10 Minutes
   - Multi Accounts With Threads
+  - For Now, Only Support Run 1 Node ID
 
 Note: 
 1. Only running 1 node if run without proxy.
